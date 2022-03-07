@@ -1,5 +1,4 @@
 import json
-from time import time
 import websocket
 import os
 from dotenv import load_dotenv
@@ -45,18 +44,3 @@ def listen2Socket():
 
 
 listen2Socket()
-
-
-# try:
-#     ws = create_connection("wss://polygon-mainnet.g.alchemy.com/v2/" + ALCHEMY_KEY)
-# except Exception as error:
-#     print("Connection error :", repr(error))
-#     time.sleep(3)
-
-# ws.send(
-#     json.dumps(
-#         {"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newHeads"]}
-#     )
-# )
-
-# ws.
