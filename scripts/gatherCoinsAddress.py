@@ -1,78 +1,69 @@
-endpoint = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map'
-
 import sys
 from time import sleep
 from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
+import pprint
+from getPolygonCoinsAddress import getPolygonCoinsAddress
 
+
+## CONFIG 
 parameters = {
 #   'start':'1',
-  'limit':'1000'
+  # 'limit':'1000'
 #   'convert':'USD'
 }
 headers = {
   'Accepts': 'application/json',
-  'X-CMC_PRO_API_KEY': 'c0f81d55-c4ee-4847-9d78-dfaf952fe10a',
+  # 'X-CMC_PRO_API_KEY': 'c0f81d55-c4ee-4847-9d78-dfaf952fe10a',
 }
+endpoint = "https://api.coingecko.com/api/v3/"
 
+marketDataParameters = \
+"vs_currency=usd\
+&category=polygon-ecosystem\
+&order=volume_asc\
+&per_page=250\
+&sparkline=false\
+&price_change_percentage=24h"
+## CONFIG_END
+
+## INIT
 session = Session()
 session.headers.update(headers)
-
-collection = []
-allCoinsId = []
-# try:
-#   response = session.get(endpoint, params=parameters)
-#   data = json.loads(response.text)
-#   for elem in data['data']:
-#     if elem['platform'] != None and elem['platform']['symbol'] == 'ETH':
-#         # print(elem)
-#         collection.append({elem['symbol'], elem['platform']['token_address']})
+## INIT END
 
 
 
-# except (ConnectionError, Timeout, TooManyRedirects) as e:
-#   print(e)
+def getPolyCoinsMarketData():
+  polygonCoinsList = getPolygonCoinsAddress()
 
-destFile = open('allCoinsOnPolygon.txt', 'a')
+  polygonCoinsWithData = {}
+  pageNb = 1
+  while 1:
+    try:
+      resp = session.get( endpoint + "coins/markets?" + marketDataParameters + "&page=" + str(pageNb))
+      # print(resp, pageNb)
+      pageNb += 1
+      asObject = json.loads(resp.text)
+      if asObject == []:
+        print('time to leave') 
+        break
+
+      for elem in asObject:
+        try:
+          if polygonCoinsList[elem['id']] and int(elem['total_volume']) > 50000:
+            polygonCoinsWithData[elem['id']] = elem
+        except:
+          salut = 1 + 1
+          # print('not found', elem['id'])
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+      print(e)
+  print(len(polygonCoinsWithData))
+
+getPolyCoinsMarketData()
 
 
-# def getCoinsInfos(id):
-#   resp = session.get('https://api.coingecko.com/api/v3/coins/' + id)
-#   while resp.status_code == 429:
-#     sleep(61)
-#     resp = session.get('https://api.coingecko.com/api/v3/coins/' + id)
-#   newdata = json.loads(resp.text)
-#   if 'platforms' in newdata:
-#     var = newdata['platforms']
-#     if 'polygon-pos' in var:
-#      # print(id , var['polygon-pos'], file=destFile)
-#       print(id , var['polygon-pos'], file=sys.stderr)
 
 
-source = open('allCoinsGeneral.json')
-tst = json.loads(source.read())
-print(tst)
-# resp = session.get("https://api.coingecko.com/api/v3/coins/list")
-
-# print(json.dumps(resp.text))
-
-
-# with open('allCoins2.txt', 'r') as allCoins:
-#     allCoinsJson = json.loads(allCoins)
-#     #print(allCoinsJson)
-
-for elem in tst:
-    print(elem)
-    # allCoinsId.append(elem['id'])
-i = 0
-
-# print(len(allCoinsId))
-# for elem in allCoinsId:
-#   if i < len(allCoinsId):
-#     getCoinsInfos(elem)
-#     i += 1
-#     print(">", i, file=sys.stderr)
-
-# print('done', file=sys.stderr)
 
