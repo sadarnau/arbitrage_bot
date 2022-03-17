@@ -22,7 +22,7 @@ endpoint = "https://api.coingecko.com/api/v3/"
 marketDataParameters = \
 "vs_currency=usd\
 &category=polygon-ecosystem\
-&order=volume_asc\
+&order=volume_desc\
 &per_page=250\
 &sparkline=false\
 &price_change_percentage=24h"
@@ -53,17 +53,13 @@ def getPolyCoinsMarketData():
       for elem in asObject:
         try:
           if polygonCoinsList[elem['id']] and int(elem['total_volume']) > 50000:
-            polygonCoinsWithData[elem['id']] = elem
+            polygonCoinsWithData[polygonCoinsList[elem['id']]] = elem
         except:
           salut = 1 + 1
           # print('not found', elem['id'])
     except (ConnectionError, Timeout, TooManyRedirects) as e:
       print(e)
   print(len(polygonCoinsWithData))
-
-getPolyCoinsMarketData()
-
-
-
+  return polygonCoinsWithData
 
 

@@ -5,3 +5,5 @@ __pycache__
 build/
 reports/
 venv
+.pytest_cache
+arbitrage
